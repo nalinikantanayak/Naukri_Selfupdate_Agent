@@ -1,0 +1,24 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Playwright / browser session
+browser_profile/
+
+# Runtime state
+state.json
+
+# Logs and screenshots
+logs/
+screenshots/
+
+# Environment variables / secrets
+.env
+*.env
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
