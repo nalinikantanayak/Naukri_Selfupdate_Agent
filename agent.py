@@ -527,9 +527,26 @@ def perform_profile_update():
         )
     )
 
+    # ============================================================
+    # VALIDATE RESUME HEADLINE LENGTH
+    # ============================================================
+
+    MAX_HEADLINE_LENGTH = 250
+
+    if len(new_headline) > MAX_HEADLINE_LENGTH:
+        raise Exception(
+            f"Resume headline exceeds Naukri's 250-character limit. "
+            f"Length: {len(new_headline)} characters."
+        )
+
     log(
         f"Selected headline version: "
         f"{new_index + 1}"
+    )
+
+    log(
+        f"Headline length: "
+        f"{len(new_headline)} characters"
     )
 
     context = None
@@ -705,12 +722,43 @@ def perform_profile_update():
             # ------------------------------------------
 
             log(
-                "Waiting for save operation..."
-            )
+                "Waiting for Naukri to save the headline..."
+    )
 
             page.wait_for_timeout(
-                3000
+                5000
             )
+
+            # ------------------------------------------
+            # CHECK HEADLINE BEFORE REFRESH
+            # ------------------------------------------
+
+            log(
+                "Checking headline after Save before refresh..."
+            )
+
+            headline_card = page.locator(
+                "div.resumeHeadline"
+            )
+
+            headline_card.wait_for(
+                state="visible",
+                timeout=30000
+            )
+
+            saved_text_before_refresh = (
+                headline_card.inner_text()
+            )
+
+            if new_headline.strip() in saved_text_before_refresh:
+                log(
+                    "Headline appears updated before refresh."
+                )
+            else:
+                log(
+                    "Headline not detected before refresh. "
+                    "Continuing with refresh verification..."
+                )
 
             # ------------------------------------------
             # REFRESH PROFILE
@@ -727,7 +775,7 @@ def perform_profile_update():
             )
 
             page.wait_for_timeout(
-                4000
+                5000
             )
 
             check_login_status(page)
